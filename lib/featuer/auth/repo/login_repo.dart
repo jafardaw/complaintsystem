@@ -1,0 +1,200 @@
+import 'package:aqaviatec/core/error/eror_handel.dart';
+import 'package:aqaviatec/core/util/api_service.dart';
+import 'package:aqaviatec/features/auth/data/model/login_model.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class LoginRepo {
+  final ApiService _apiService;
+
+  LoginRepo(this._apiService);
+
+  Future<LoginResponseModel> login({
+    required String usernameOrPhone,
+    required String password,
+  }) async {
+    try {
+      final response = await _apiService.post('login', {
+        "email": usernameOrPhone,
+        "password": password,
+      });
+
+      final data = response.data;
+
+      if (data['status'] == "success") {
+        // 1. تحويل الـ JSON إلى النموذج
+        final responseModel = LoginResponseModel.fromJson(data);
+
+        // 2. حفظ التوكن (إن وجد)
+        if (responseModel.token != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', responseModel.token!);
+        }
+
+        // 3. إرجاع النموذج الذي يحتوي على الرسالة و hasProfile
+        return responseModel;
+      } else {
+        // منطق الفشل كما هو
+        print(data['message']);
+        throw Exception(data['message'] ?? 'فشل تسجيل الدخول.');
+      }
+    } on DioException catch (e) {
+      // ... (التعامل مع أخطاء Dio)
+      if (kDebugMode) {
+        print('DioException caught: ${e.message}');
+      }
+      // يفترض وجود ErrorHandler.handleDioError(e)
+      throw ErrorHandler.handleDioError(e);
+    } catch (e) {
+      // ... (التعامل مع الأخطاء العامة)
+      if (kDebugMode) {
+        print('General Exception caught: $e');
+      }
+      rethrow;
+    }
+  }
+
+  Future<String> register({
+    required String email,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    try {
+      final response = await _apiService.post('register', {
+        "email": email,
+        "password": password,
+        "password_confirmation": passwordConfirmation,
+      });
+
+      final data = response.data;
+
+      if (data['status'] == "success") {
+        return data['message'];
+      } else {
+        throw Exception(data['message'] ?? 'فشل في عملية التسجيل.');
+      }
+    } on DioException catch (e) {
+      if (kDebugMode) {
+        print('DioException caught in RegisterRepo: ${e.message}');
+      }
+      throw ErrorHandler.handleDioError(e); // التعامل مع أخطاء Dio
+    } catch (e) {
+      if (kDebugMode) {
+        print('General Exception caught in RegisterRepo: $e');
+      }
+      rethrow;
+    }
+  }
+
+  Future<String> verifyEmail({
+    required int chektap,
+    required String email,
+    required String verificationCode,
+  }) async {
+    String endpoint = '';
+    try {
+      if (chektap == 1) {
+        endpoint = 'checkCode';
+      } else if (chektap == 0) {
+        endpoint = 'verify-email';
+      }
+      final response = await _apiService.post(endpoint, {
+        "email": email,
+        "code": verificationCode, // إرسال رمز التحقق
+      });
+
+      final data = response.data;
+
+      if (data['status'] == "success") {
+        if (chektap == 0) {}
+        if (data['data'] != null && data['data']['token'] != null) {
+          final token = data['data']['token'];
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', token);
+        }
+        return data['message'];
+      } else if (chektap == 1) {
+        return data['message'];
+      } else {
+        throw Exception(
+          data['message'] ?? 'فشل في عملية تأكيد البريد الإلكتروني.',
+        );
+      }
+    } on DioException catch (e) {
+      if (kDebugMode) {
+        print('DioException caught in VerifyEmailRepo: ${e.message}');
+      }
+      throw ErrorHandler.handleDioError(e); // التعامل مع أخطاء Dio
+    } catch (e) {
+      if (kDebugMode) {
+        print('General Exception caught in VerifyEmailRepo: $e');
+      }
+      rethrow;
+    }
+  }
+
+  Future<String> resendCode({required String email}) async {
+    try {
+      final response = await _apiService.post('resend-code', {"email": email});
+
+      final data = response.data;
+
+      if (data['status'] == "success") {
+        return data['message'];
+      } else {
+        throw Exception(data['message'] ?? 'فشل في إعادة إرسال كود التحقق.');
+      }
+    } on DioException catch (e) {
+      if (kDebugMode) {
+        print('DioException caught in ResendCodeRepo: ${e.message}');
+      }
+      throw ErrorHandler.handleDioError(e);
+    } catch (e) {
+      if (kDebugMode) {
+        print('General Exception caught in ResendCodeRepo: $e');
+      }
+      rethrow;
+    }
+  }
+
+  Future<String> logout() async {
+    // 🔑 الخطوة الأولى والأهم: حذف التوكن محلياً على الفور
+    // هذا يضمن خروج المستخدم فوراً من التطبيق حتى لو فشل طلب الـ API
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+
+    // إزالة أي بيانات مستخدم مخزنة أخرى إذا لزم الأمر
+    // await prefs.remove('user_data');
+
+    // إعداد رسالة افتراضية
+    String resultMessage = 'تم تسجيل الخروج بنجاح.';
+
+    try {
+      // 2. محاولة إخبار الخادم بإنهاء الجلسة (لإبطال التوكن في قاعدة البيانات)
+      final response = await _apiService.postwithOutData(
+        'logout',
+      ); // استخدام دالة postwithOutData
+
+      final data = response.data;
+
+      // تحقق من الرد القياسي (إذا كان الخادم يرجع رسالة نجاح)
+      if (data['status'] == "success" || data['message'] != null) {
+        resultMessage = data['message'] ?? 'تم تسجيل الخروج من الخادم بنجاح.';
+      }
+    } on DioException catch (e) {
+      if (kDebugMode) {
+        print('DioException caught during logout: ${e.message}');
+      }
+      // لا نحتاج لرفع خطأ هنا! الأهم هو أننا حذفنا التوكن محلياً.
+      // الـ 401 الذي أرسلته (غير مصرح بالدخول) يعني أن المستخدم غير مسجل، أو أن التوكن تم حذفه مسبقاً،
+      // لذا لا يؤثر على نجاح عملية تسجيل الخروج من ناحية المستخدم.
+    } catch (e) {
+      if (kDebugMode) {
+        print('General Exception caught during logout: $e');
+      }
+    }
+
+    return resultMessage;
+  }
+}
