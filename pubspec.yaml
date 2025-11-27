@@ -32,10 +32,7 @@ dependencies:
   dio: ^5.9.0
   flutter:
     sdk: flutter
-  flutter_bloc: ^9.1.1
-  google_sign_in: ^7.2.0
-  pin_code_fields: ^8.0.1
-  shared_preferences: ^2.5.3
+
 
 dev_dependencies:
 

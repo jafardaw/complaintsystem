@@ -1,6 +1,5 @@
-import 'package:aqaviatec/features/change_password/presentation/manger/reset_password_state.dart';
-import 'package:aqaviatec/features/change_password/repo/chang_password_repo.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:compaintsystem/featuer/change_password/presentation/manger/reset_password_state.dart';
+import 'package:compaintsystem/featuer/change_password/repo/chang_password_repo.dart';
 
 class ResetPasswordCubit extends Cubit<ResetPasswordState> {
   final ChangPasswordRepo _changPasswordRepo;
