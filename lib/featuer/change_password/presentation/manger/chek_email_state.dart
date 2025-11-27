@@ -5,8 +5,8 @@ class ChekEmailInitial extends ChekEmailState {}
 class ChekEmailLoading extends ChekEmailState {}
 
 class ChekEmailSuccess extends ChekEmailState {
-  final String massege;
-  ChekEmailSuccess(this.massege);
+  final int userId;
+  ChekEmailSuccess(this.userId);
 }
 
 class ChekEmailFailure extends ChekEmailState {

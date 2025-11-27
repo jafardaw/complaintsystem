@@ -1,17 +1,17 @@
-import 'package:aqaviatec/core/func/show_snak_bar.dart';
-import 'package:aqaviatec/core/style/color.dart';
-import 'package:aqaviatec/core/util/api_service.dart';
-import 'package:aqaviatec/core/util/assetimage.dart';
-import 'package:aqaviatec/core/util/const.dart';
-import 'package:aqaviatec/core/widget/background_viwe.dart';
-import 'package:aqaviatec/core/widget/custom_button.dart';
-import 'package:aqaviatec/core/widget/custom_field.dart';
-import 'package:aqaviatec/core/widget/error_widget_view.dart';
-import 'package:aqaviatec/core/widget/loading_view.dart';
-import 'package:aqaviatec/features/auth/presentation/manger/register_cubit.dart';
-import 'package:aqaviatec/features/auth/presentation/manger/register_state.dart';
-import 'package:aqaviatec/features/auth/presentation/view/verify_email_view.dart';
-import 'package:aqaviatec/features/auth/repo/login_repo.dart';
+import 'package:compaintsystem/core/func/show_snak_bar.dart';
+import 'package:compaintsystem/core/style/color.dart';
+import 'package:compaintsystem/core/utils/api_service.dart';
+import 'package:compaintsystem/core/utils/assetimage.dart';
+import 'package:compaintsystem/core/utils/const.dart';
+import 'package:compaintsystem/core/widget/background_viwe.dart';
+import 'package:compaintsystem/core/widget/custom_button.dart';
+import 'package:compaintsystem/core/widget/custom_field.dart';
+import 'package:compaintsystem/core/widget/error_widget_view.dart';
+import 'package:compaintsystem/core/widget/loading_view.dart';
+import 'package:compaintsystem/featuer/auth/presentation/manger/register_cubit.dart';
+import 'package:compaintsystem/featuer/auth/presentation/manger/register_state.dart';
+import 'package:compaintsystem/featuer/auth/presentation/view/verify_email_view.dart';
+import 'package:compaintsystem/featuer/auth/repo/login_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -26,14 +26,13 @@ class _RegisterViewState extends State<RegisterView> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _passwordConfirmationController =
-      TextEditingController(); // المتحكم الجديد
+  final _fullNameController = TextEditingController();
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-    _passwordConfirmationController.dispose();
+    _fullNameController.dispose();
     super.dispose();
   }
 
@@ -49,7 +48,7 @@ class _RegisterViewState extends State<RegisterView> {
           formKey: _formKey,
           emailController: _emailController,
           passwordController: _passwordController,
-          passwordConfirmationController: _passwordConfirmationController,
+          fullNameController: _fullNameController,
         ),
       ),
     );
@@ -62,16 +61,16 @@ class RegisterViewBody extends StatelessWidget {
     required GlobalKey<FormState> formKey,
     required TextEditingController emailController,
     required TextEditingController passwordController,
-    required TextEditingController passwordConfirmationController,
+    required TextEditingController fullNameController,
   }) : _formKey = formKey,
        _emailController = emailController,
        _passwordController = passwordController,
-       _passwordConfirmationController = passwordConfirmationController;
+       _fullNameController = fullNameController;
 
   final GlobalKey<FormState> _formKey;
+  final TextEditingController _fullNameController;
   final TextEditingController _emailController;
   final TextEditingController _passwordController;
-  final TextEditingController _passwordConfirmationController;
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +107,20 @@ class RegisterViewBody extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 40),
+                  CustomTextField(
+                    controller: _fullNameController,
+                    labelText: 'الاسم الكامل ',
+                    hintText: 'أدخل الاسم الكامل',
+                    prefixIcon: const Icon(Icons.email, color: Colors.blueGrey),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'الرجاء إدخال الاسم الكامل';
+                      }
+                      // يمكنك إضافة المزيد من قواعد التحقق من صحة البريد الإلكتروني هنا
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
 
                   // حقل الإيميل
                   CustomTextField(
@@ -141,71 +154,31 @@ class RegisterViewBody extends StatelessWidget {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 20),
 
                   // حقل تأكيد كلمة المرور الجديد
-                  CustomTextField(
-                    controller: _passwordConfirmationController,
-                    obscureText: true,
-                    labelText: 'تأكيد كلمة المرور',
-                    hintText: 'أعد إدخال كلمة المرور',
-                    prefixIcon: const Icon(
-                      Icons.lock_reset,
-                      color: Palette.primary,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'الرجاء تأكيد كلمة المرور';
-                      }
-                      if (value != _passwordController.text) {
-                        return 'كلمتا المرور غير متطابقتين'; // التحقق من التطابق
-                      }
-                      return null;
-                    },
-                  ),
-
                   const SizedBox(height: 30),
 
                   BlocConsumer<RegisterCubit, RegisterState>(
                     listener: (context, state) {
                       if (state is RegisterSuccess) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => VerifyEmailView(
-                              email: _emailController.text,
-                              chektap: 0,
-                            ),
-                          ),
-                        );
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) =>
+                        //         VerifyEmailView(userID: state.userId),
+                        //   ),
+                        // );
                         showCustomSnackBar(
                           context,
                           state.message, // "تم إرسال كود التحقق بنجاح."
                           color: Palette.success,
                         );
                       } else if (state is RegisterFailure) {
-                        if (state.error == 'هذا البريد مستخدم مسبقاً.') {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => VerifyEmailView(
-                                email: _emailController.text,
-                                chektap: 0,
-                              ),
-                            ),
-                          );
-                          showCustomSnackBar(
-                            context,
-                            'ادخل كود التحقق المرسل', // "تم إرسال كود التحقق بنجاح."
-                            color: Palette.success,
-                          );
-                        } else {
-                          showCustomSnackBar(
-                            context,
-                            state.error,
-                            color: Palette.error,
-                          );
-                        }
+                        showCustomSnackBar(
+                          context,
+                          state.error,
+                          color: Palette.error,
+                        );
                       }
                     },
                     builder: (context, state) {
@@ -217,10 +190,10 @@ class RegisterViewBody extends StatelessWidget {
                           errorMessage: state.error,
                           onRetry: () {
                             context.read<RegisterCubit>().register(
+                              fullName: _fullNameController.text,
                               email: _emailController.text,
+
                               password: _passwordController.text,
-                              passwordConfirmation:
-                                  _passwordConfirmationController.text,
                             );
                           },
                         );
@@ -229,10 +202,10 @@ class RegisterViewBody extends StatelessWidget {
                         onTap: () {
                           if (_formKey.currentState!.validate()) {
                             context.read<RegisterCubit>().register(
+                              fullName: _fullNameController.text,
                               email: _emailController.text,
+
                               password: _passwordController.text,
-                              passwordConfirmation:
-                                  _passwordConfirmationController.text,
                             );
                           }
                         },

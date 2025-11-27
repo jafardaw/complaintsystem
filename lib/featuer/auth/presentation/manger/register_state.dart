@@ -6,7 +6,9 @@ class RegisterLoading extends RegisterState {}
 
 class RegisterSuccess extends RegisterState {
   final String message; // لحمل رسالة النجاح
-  RegisterSuccess(this.message);
+  final int userId; // لحمل معرف المستخدم
+
+  RegisterSuccess(this.message, this.userId);
 }
 
 class RegisterFailure extends RegisterState {

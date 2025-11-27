@@ -4,7 +4,7 @@ class Assets {
 
   /// Assets for assetsImagesPhoto20250924144805RemovebgPreview
   static const String assetsImagesPhoto20250924144805RemovebgPreview =
-      "assets/images/logo-removebg-preview (1).png";
+      "assets/images/logo_comp-removebg-preview.png";
 
   static const String assetsImagesPhoto20250924164616 =
       "assets/images/photo_2025-09-24_16-46-16.jpg";

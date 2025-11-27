@@ -1,33 +1,26 @@
 // lib/features/login/data/models/login_response_model.dart
 
+import 'package:compaintsystem/featuer/auth/data/model/user_model.dart';
+
 class LoginResponseModel {
   final String message;
-  final bool hasProfile;
-  final String?
-  token; // (اختياري) يمكن إرجاع التوكن أو التعامل معه مباشرة في الريبو
+  final String token; // التوكن أصبح إلزامياً وموجود في الجذر
+  final UserModel user; // **جديد:** بيانات المستخدم كاملة
 
   LoginResponseModel({
     required this.message,
-    required this.hasProfile,
-    this.token,
+    required this.token,
+    required this.user,
   });
 
   // Factory constructor لتحويل JSON إلى نموذج Dart
   factory LoginResponseModel.fromJson(Map<String, dynamic> json) {
-    // التأكد من أن حقل "data" موجود للوصول إلى محتوياته
-    final data = json['data'] as Map<String, dynamic>?;
-
-    // استخدام 'message' مباشرة من الجذر (Root)
-    final message = json['message'] as String? ?? 'تم تسجيل الدخول بنجاح.';
-
-    // استخراج 'has_profile' و 'token' من حقل 'data'
-    final hasProfile = data?['has_profile'] as bool? ?? false;
-    final token = data?['token'] as String?;
-
+    // الاستجابة الجديدة تضع كل شيء في الجذر
     return LoginResponseModel(
-      message: message,
-      hasProfile: hasProfile,
-      token: token,
+      message: json['message'] as String? ?? 'تم تسجيل الدخول بنجاح.',
+      token: json['token'] as String,
+      // تحويل خريطة المستخدم إلى نموذج UserModel
+      user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
     );
   }
 }

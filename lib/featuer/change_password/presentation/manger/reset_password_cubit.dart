@@ -1,5 +1,6 @@
 import 'package:compaintsystem/featuer/change_password/presentation/manger/reset_password_state.dart';
 import 'package:compaintsystem/featuer/change_password/repo/chang_password_repo.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ResetPasswordCubit extends Cubit<ResetPasswordState> {
   final ChangPasswordRepo _changPasswordRepo;
@@ -7,18 +8,18 @@ class ResetPasswordCubit extends Cubit<ResetPasswordState> {
   ResetPasswordCubit(this._changPasswordRepo) : super(ResetPasswordInitial());
 
   Future<void> resetPassword({
-    required String email,
+    required int userId,
+    required String code,
     required String password,
     required String passwordConfirmation,
-    required String code,
   }) async {
     emit(ResetPasswordLoading());
     try {
       final message = await _changPasswordRepo.resetPassword(
-        email: email,
+        userId: userId,
+        code: code,
         password: password,
         passwordConfirmation: passwordConfirmation,
-        code: code,
       );
       emit(ResetPasswordSuccess(message));
     } catch (e) {

@@ -8,19 +8,26 @@ class RegisterCubit extends Cubit<RegisterState> {
   RegisterCubit(this._registerRepo) : super(RegisterInitial());
 
   Future<void> register({
+    required String fullName,
     required String email,
     required String password,
-    required String passwordConfirmation,
   }) async {
     emit(RegisterLoading());
     try {
-      final message = await _registerRepo.register(
+      // **التعديل هنا:** المتغير الآن يستقبل user_id كـ int
+      final userId = await _registerRepo.register(
+        fullName: fullName,
         email: email,
         password: password,
-        passwordConfirmation: passwordConfirmation,
       );
-      emit(RegisterSuccess(message));
+
+      // بما أن الـ Repo أصبح يرجع user_id فقط، نستخدم رسالة ثابتة للنجاح
+      const successMessage = "تم إنشاء الحساب بنجاح، وتم إرسال كود التحقق.";
+
+      // **إصدار حالة النجاح مع الرسالة و userId الجديد**
+      emit(RegisterSuccess(successMessage, userId));
     } catch (e) {
+      // تبقى معالجة الأخطاء كما هي
       emit(RegisterFailure(e.toString()));
     }
   }

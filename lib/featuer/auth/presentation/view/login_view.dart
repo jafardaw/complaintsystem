@@ -1,8 +1,20 @@
+import 'package:compaintsystem/core/func/show_snak_bar.dart';
+import 'package:compaintsystem/core/style/color.dart';
+import 'package:compaintsystem/core/style/styles.dart';
 import 'package:compaintsystem/core/utils/api_service.dart';
+import 'package:compaintsystem/core/utils/assetimage.dart';
+import 'package:compaintsystem/core/utils/const.dart';
+import 'package:compaintsystem/core/widget/background_viwe.dart';
+import 'package:compaintsystem/core/widget/custom_button.dart';
+import 'package:compaintsystem/core/widget/custom_field.dart';
 import 'package:compaintsystem/featuer/auth/presentation/manger/google_login_cubit.dart';
+import 'package:compaintsystem/featuer/auth/presentation/manger/google_login_state.dart';
 import 'package:compaintsystem/featuer/auth/presentation/manger/login_cubit.dart';
+import 'package:compaintsystem/featuer/auth/presentation/manger/login_state.dart';
+import 'package:compaintsystem/featuer/auth/presentation/view/register_view.dart';
 import 'package:compaintsystem/featuer/auth/repo/google_login_repo.dart';
 import 'package:compaintsystem/featuer/auth/repo/login_repo.dart';
+import 'package:compaintsystem/featuer/change_password/presentation/view/chek_email_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -31,9 +43,9 @@ class _LoginViewState extends State<LoginView> {
       // ⬅️ استخدام MultiBlocProvider لتوفير كل الكيوبت
       providers: [
         BlocProvider(create: (context) => LoginCubit(LoginRepo(ApiService()))),
-        BlocProvider(
-          create: (context) => GoogleLoginCubit(GoogleLoginService()),
-        ),
+        // BlocProvider(
+        //   create: (context) => GoogleLoginCubit(GoogleLoginService()),
+        // ),
       ],
       child: BackgroundWrapper(
         // ⬅️ استخدام ويدجت الخلفية
@@ -133,10 +145,10 @@ class LoginViewBody extends StatelessWidget {
                 const SizedBox(height: 18),
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ChekEmailView()),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(builder: (context) => ChekEmailView()),
+                    // );
                   },
 
                   child: Padding(
@@ -152,34 +164,6 @@ class LoginViewBody extends StatelessWidget {
                   listener: (context, state) async {
                     if (state is LoginSuccess) {
                       if (!context.mounted) return;
-
-                      // Widget destinationPage;
-                      if (state.responseModel.hasProfile == true) {
-                        // حالة: isProfile = 1 (تم التحقق)، ننتقل للصفحة الرئيسية/الدورات
-                        // هذا هو المنطق الأصح بعد نجاح تسجيل الدخول
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CoursesListView(),
-                          ),
-                        );
-                      } else {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ProfileEditView(),
-                          ),
-                        ); // استبدلها باسم صفحة التسجيل لديك
-                      }
-
-                      // الخطوة 3: التوجيه إلى الوجهة المحددة
-
-                      // Navigator.pushReplacement(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => CoursesListView(),
-                      //   ),
-                      // );
 
                       showCustomSnackBar(
                         context,
@@ -218,12 +202,6 @@ class LoginViewBody extends StatelessWidget {
                 BlocConsumer<GoogleLoginCubit, GoogleLoginState>(
                   listener: (context, state) {
                     if (state is GoogleLoginSuccess) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const CoursesListView(),
-                        ),
-                      );
                       showCustomSnackBar(
                         context,
                         'تم تسجيل الدخول بنجاح عبر Google',
@@ -245,9 +223,9 @@ class LoginViewBody extends StatelessWidget {
                         onTap: isGoogleLoading
                             ? null
                             : () {
-                                context
-                                    .read<GoogleLoginCubit>()
-                                    .loginWithGoogle();
+                                // context
+                                //     .read<GoogleLoginCubit>()
+                                //     .loginWithGoogle();
                               },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
