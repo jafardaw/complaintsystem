@@ -7,10 +7,10 @@ class ResendCodeCubit extends Cubit<ResendCodeState> {
 
   ResendCodeCubit(this._resendCodeRepo) : super(ResendCodeInitial());
 
-  Future<void> resendCode({required String email}) async {
+  Future<void> resendCode({required int userId}) async {
     emit(ResendCodeLoading());
     try {
-      final message = await _resendCodeRepo.resendCode(email: email);
+      final message = await _resendCodeRepo.resendCode(userId: userId);
       emit(ResendCodeSuccess(message));
     } catch (e) {
       emit(ResendCodeFailure(e.toString()));

@@ -8,16 +8,14 @@ class VerifyEmailCubit extends Cubit<VerifyEmailState> {
   VerifyEmailCubit(this._verifyEmailRepo) : super(VerifyEmailInitial());
 
   Future<void> verifyEmail({
-    required String email,
+    required int userId,
     required String verificationCode,
-    required int chektap,
   }) async {
     emit(VerifyEmailLoading());
     try {
       final message = await _verifyEmailRepo.verifyEmail(
-        email: email,
+        userId: userId,
         verificationCode: verificationCode,
-        chektap: chektap,
       );
       emit(VerifyEmailSuccess(message));
     } catch (e) {

@@ -1,5 +1,5 @@
-import 'package:aqaviatec/core/error/eror_handel.dart';
-import 'package:aqaviatec/core/util/api_service.dart';
+import 'package:compaintsystem/core/error/eror_handel.dart';
+import 'package:compaintsystem/core/utils/api_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
@@ -8,24 +8,15 @@ class ChangPasswordRepo {
 
   ChangPasswordRepo(this._apiService);
 
-  Future<String> chekEmail({required String usernameOrPhone}) async {
+  Future<int> chekEmail({required String usernameOrPhone}) async {
     try {
-      final response = await _apiService.post('checkEmail', {
-        "email": usernameOrPhone,
+      final response = await _apiService.post('password/forgot', {
+        "login": usernameOrPhone,
       });
 
       final data = response.data;
 
-      // تحقق من حالة الرد قبل التعامل مع البيانات
-      if (data['status'] == "success") {
-        // if (data['data']['token'] != null) {
-        //   final prefs = await SharedPreferences.getInstance();
-        //   await prefs.setString('token', data['data']['token']);
-        // }
-        return data['message'];
-      } else {
-        throw Exception(data['message'] ?? 'Failed to chek in.');
-      }
+      return data['user_id'];
     } on DioException catch (e) {
       if (kDebugMode) {
         print('DioException caught: ${e.message}');
@@ -40,17 +31,17 @@ class ChangPasswordRepo {
   }
 
   Future<String> resetPassword({
-    required String email,
+    required int userId,
+    required String code,
     required String password,
     required String passwordConfirmation,
-    required String code,
   }) async {
     try {
-      final response = await _apiService.post('changePassword', {
-        "email": email,
+      final response = await _apiService.post('password/reset', {
+        "user_id": userId,
+        "code": code,
         "password": password,
         "password_confirmation": passwordConfirmation,
-        "code": code,
       });
 
       final data = response.data;
