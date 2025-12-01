@@ -1,5 +1,3 @@
-import 'package:compaintsystem/featuer/auth/data/model/login_model.dart';
-
 abstract class VerifyEmailState {}
 
 class VerifyEmailInitial extends VerifyEmailState {}
@@ -7,7 +5,7 @@ class VerifyEmailInitial extends VerifyEmailState {}
 class VerifyEmailLoading extends VerifyEmailState {}
 
 class VerifyEmailSuccess extends VerifyEmailState {
-  final LoginResponseModel responseModel;
+  final String responseModel;
   VerifyEmailSuccess(this.responseModel);
 }
 

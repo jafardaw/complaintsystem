@@ -16,35 +16,24 @@ class LoginRepo {
   }) async {
     try {
       final response = await _apiService.post('auth/login', {
-        "login": usernameOrPhone,
+        "identifier": usernameOrPhone,
         "password": password,
       });
 
       final data = response.data;
 
-      // **تم إزالة التحقق من data['status'] == "success"**
-      // بما أن الاستجابة الناجحة هي دائماً 200 وتأتي بهذا التنسيق
-
-      // 1. تحويل الـ JSON إلى النموذج الجديد
       final responseModel = LoginResponseModel.fromJson(data);
 
-      // 2. حفظ التوكن (الآن هو حقل إلزامي)
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', responseModel.token);
 
-      // **يمكنك هنا أيضاً حفظ بيانات المستخدم (user) إذا لزم الأمر**
-      await prefs.setInt('user_id', responseModel.user.id);
-
-      // 3. إرجاع النموذج الذي يحتوي على الرسالة و بيانات المستخدم (user)
       return responseModel;
     } on DioException catch (e) {
-      // ...
       if (kDebugMode) {
         print('DioException caught: ${e.message}');
       }
       throw ErrorHandler.handleDioError(e);
     } catch (e) {
-      // ...
       if (kDebugMode) {
         print('General Exception caught: $e');
       }
@@ -91,32 +80,24 @@ class LoginRepo {
     }
   }
 
-  Future<LoginResponseModel> verifyEmail({
-    required int userId,
+  Future<String> verifyEmail({
+    required String email,
     required String verificationCode,
   }) async {
     try {
       final response = await _apiService.post('auth/verify-otp', {
-        "user_id": userId,
+        "contact": email,
         "code": verificationCode,
       });
 
       final data = response.data;
 
-      // if (data['data'] != null && data['data']['token'] != null) {
-      //   final token = data['data']['token'];
-      //   final prefs = await SharedPreferences.getInstance();
-      //   await prefs.setString('token', token);
-      // }
-      final responseModel = LoginResponseModel.fromJson(data);
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', responseModel.token);
-      return responseModel;
+      return data['message'];
     } on DioException catch (e) {
       if (kDebugMode) {
         print('DioException caught in VerifyEmailRepo: ${e.message}');
       }
-      throw ErrorHandler.handleDioError(e); // التعامل مع أخطاء Dio
+      throw ErrorHandler.handleDioError(e);
     } catch (e) {
       if (kDebugMode) {
         print('General Exception caught in VerifyEmailRepo: $e');
