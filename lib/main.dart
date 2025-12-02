@@ -1,4 +1,6 @@
-import 'package:compaintsystem/featuer/splash_view.dart';
+import 'package:compaintsystem/featuer/complaint/presentation/view/add_complaint_view.dart';
+import 'package:compaintsystem/featuer/complaint/presentation/view/complaint_view.dart';
+import 'package:compaintsystem/featuer/goverment_agencies/presentation/view/goverment_agencies_view.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -11,6 +13,10 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'Complaint System', home: const SplashScreen());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Complaint System',
+      home: const NewComplaintView(agencyId: 3),
+    );
   }
 }
