@@ -2,6 +2,7 @@
 
 import 'package:compaintsystem/core/func/show_snak_bar.dart';
 import 'package:compaintsystem/core/style/color.dart';
+import 'package:compaintsystem/core/widget/app_bar_widget.dart';
 import 'package:compaintsystem/core/widget/background_viwe.dart';
 import 'package:compaintsystem/core/widget/custom_button.dart';
 import 'package:compaintsystem/featuer/notification/data/model/notification_model.dart';
@@ -19,94 +20,94 @@ class NotificationsScreen extends StatelessWidget {
     context.read<NotificationsListCubit>().getNotifications();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('الإشعارات'), centerTitle: true),
-      body: BackgroundWrapper(
-        backgroundImagePath: '',
-        child: BlocConsumer<NotificationsListCubit, NotificationsListState>(
-          listener: (context, state) {
-            // معالجة أخطاء التحميل الإضافي
-            if (state is NotificationsListSuccess && state.currentPage > 1) {
-              // قد نستخدم هنا BlocListener في الـ UI
-            }
-          },
-          builder: (context, state) {
-            // 1. حالة التحميل الأولي
-            if (state is NotificationsListLoading ||
-                state is NotificationsListInitial) {
-              return const Center(child: CircularProgressIndicator());
-            }
+      appBar: AppareWidget(
+        title: 'الاشعارات',
+        automaticallyImplyLeading: false,
+      ),
+      body: BlocConsumer<NotificationsListCubit, NotificationsListState>(
+        listener: (context, state) {
+          // معالجة أخطاء التحميل الإضافي
+          if (state is NotificationsListSuccess && state.currentPage > 1) {
+            // قد نستخدم هنا BlocListener في الـ UI
+          }
+        },
+        builder: (context, state) {
+          // 1. حالة التحميل الأولي
+          if (state is NotificationsListLoading ||
+              state is NotificationsListInitial) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            // 2. حالة الفشل الأولي
-            if (state is NotificationsListFailure) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'فشل تحميل الإشعارات. يرجى المحاولة مرة أخرى.',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    const SizedBox(height: 15),
-                    CustomButton(
-                      text: 'إعادة المحاولة',
-                      onTap: () => context
-                          .read<NotificationsListCubit>()
-                          .getNotifications(),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            // 3. حالة النجاح (Success/LoadingMore)
-            if (state is NotificationsListSuccess) {
-              final cubit = context.read<NotificationsListCubit>();
-              final notifications = state.notifications;
-              final isLoadingMore = state is NotificationsListLoadingMore;
-
-              if (notifications.isEmpty) {
-                return const Center(
-                  child: Text(
-                    'لا توجد إشعارات حالياً.',
-                    style: TextStyle(fontSize: 18),
+          // 2. حالة الفشل الأولي
+          if (state is NotificationsListFailure) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'فشل تحميل الإشعارات. يرجى المحاولة مرة أخرى.',
+                    style: TextStyle(color: Colors.red),
                   ),
-                );
-              }
+                  const SizedBox(height: 15),
+                  CustomButton(
+                    text: 'إعادة المحاولة',
+                    onTap: () => context
+                        .read<NotificationsListCubit>()
+                        .getNotifications(),
+                  ),
+                ],
+              ),
+            );
+          }
 
-              return NotificationListener<ScrollNotification>(
-                onNotification: (ScrollNotification scrollInfo) {
-                  // التحقق من وصول المستخدم لأسفل القائمة
-                  if (scrollInfo.metrics.pixels ==
-                          scrollInfo.metrics.maxScrollExtent &&
-                      state.hasMore &&
-                      !isLoadingMore) {
-                    cubit.loadMoreNotifications();
-                    return true; // تم التعامل مع الإشعار
-                  }
-                  return false;
-                },
-                child: ListView.builder(
-                  itemCount: notifications.length + (state.hasMore ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index == notifications.length) {
-                      // عنصر التحميل الإضافي في نهاية القائمة
-                      return const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      );
-                    }
+          // 3. حالة النجاح (Success/LoadingMore)
+          if (state is NotificationsListSuccess) {
+            final cubit = context.read<NotificationsListCubit>();
+            final notifications = state.notifications;
+            final isLoadingMore = state is NotificationsListLoadingMore;
 
-                    final notification = notifications[index];
-                    return NotificationCard(notification: notification);
-                  },
+            if (notifications.isEmpty) {
+              return const Center(
+                child: Text(
+                  'لا توجد إشعارات حالياً.',
+                  style: TextStyle(fontSize: 18),
                 ),
               );
             }
-            return const SizedBox.shrink(); // حالة افتراضية
-          },
-        ),
+
+            return NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification scrollInfo) {
+                // التحقق من وصول المستخدم لأسفل القائمة
+                if (scrollInfo.metrics.pixels ==
+                        scrollInfo.metrics.maxScrollExtent &&
+                    state.hasMore &&
+                    !isLoadingMore) {
+                  cubit.loadMoreNotifications();
+                  return true; // تم التعامل مع الإشعار
+                }
+                return false;
+              },
+              child: ListView.builder(
+                itemCount: notifications.length + (state.hasMore ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index == notifications.length) {
+                    // عنصر التحميل الإضافي في نهاية القائمة
+                    return const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    );
+                  }
+
+                  final notification = notifications[index];
+                  return NotificationCard(notification: notification);
+                },
+              ),
+            );
+          }
+          return const SizedBox.shrink(); // حالة افتراضية
+        },
       ),
     );
   }

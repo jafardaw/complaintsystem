@@ -1,12 +1,19 @@
+// lib/features/home/presentation/view/home_view.dart
+
 import 'package:compaintsystem/core/style/color.dart';
 import 'package:compaintsystem/core/utils/api_service.dart';
-import 'package:compaintsystem/core/widget/app_bar_widget.dart';
+
+import 'package:compaintsystem/featuer/goverment_agencies/presentation/view/goverment_agencies_view.dart';
+import 'package:compaintsystem/featuer/notification/presentation/manger/cubit/notifications_list_state_cubit.dart';
+import 'package:compaintsystem/featuer/notification/presentation/view/notifications_screen.dart';
+
+import 'package:compaintsystem/featuer/notification/repo/notifacation_repo.dart';
+
 import 'package:compaintsystem/featuer/profile/presentation/manger/profile_cubit.dart';
-import 'package:compaintsystem/featuer/profile/presentation/view/profile_view.dart';
 import 'package:compaintsystem/featuer/profile/repo/profile_repo.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// يجب استيراد حزمة شريط التنقل المنحني
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class HomeView extends StatefulWidget {
@@ -17,38 +24,23 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  // مؤشر الصفحة الحالية (يبدأ من 0)
   int _selectedIndex = 0;
-
   late final List<Widget> _pages;
 
   @override
   void initState() {
     super.initState();
+
+    // قائمة الصفحات بدون BlocProvider — فقط Widgets مباشرة
     _pages = [
-      // 1. الرئيسية
-      const Center(
-        child: Text(
-          'محتوى الصفحة الرئيسية',
-          style: TextStyle(fontSize: 20, color: Colors.indigo),
-        ),
-      ),
-
+      GovermentAgenciesView(),
       const Center(
         child: Text(
           'محتوى الشكاوى والتقارير',
           style: TextStyle(fontSize: 20, color: Colors.blueGrey),
         ),
       ),
-
-      const Center(
-        child: Text(
-          'محتوى الشكاوى والتقارير',
-          style: TextStyle(fontSize: 20, color: Colors.blueGrey),
-        ),
-      ),
-
-      // 4. الإعدادات
+      const NotificationsScreen(),
       const Center(
         child: Text(
           'محتوى الإعدادات',
@@ -60,46 +52,31 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    // تم الحفاظ على BlocProvider الخارجي كما كان في الكود الأصلي
-    return BlocProvider(
-      // يمكن استخدام ProfileCubit هنا لجميع الصفحات التي تحتاجه، أو كما تم في initState
-      create: (context) => ProfileCubit(ProfileRepo(ApiService())),
-      child: Scaffold(
-        // شريط التطبيق (AppBar)
-        appBar: AppareWidget(
-          title: 'نظام ادارة الشكاوي',
-          automaticallyImplyLeading: true,
-          actions: [
-            // Builder(
-            //   // نحتاج Builder للوصول إلى Scaffold.of(context)
-            //   builder: (context) => IconButton(
-            //     icon: const Icon(Icons.menu),
-            //     onPressed: () =>
-            //         Scaffold.of(context).openDrawer(), // لفتح القائمة الجانبية
-            //   ),
-            // ),
-          ],
+    return MultiBlocProvider(
+      providers: [
+        // Cubit الخاص بالملف الشخصي
+        BlocProvider<ProfileCubit>(
+          create: (_) => ProfileCubit(ProfileRepo(ApiService())),
         ),
 
-        // القائمة الجانبية (Drawer)
-        drawer: const ProfileDrawer(),
+        // Cubit الخاص بجلب قائمة الإشعارات
+        BlocProvider<NotificationsListCubit>(
+          create: (_) => NotificationsListCubit(NotificationRepo(ApiService())),
+        ),
+      ],
 
-        // محتوى الصفحة، يتغير بناءً على المؤشر المحدد
+      child: Scaffold(
         body: _pages[_selectedIndex],
 
-        // شريط التنقل السفلي المنحني (CurvedNavigationBar)
         bottomNavigationBar: CurvedNavigationBar(
-          index: _selectedIndex, // المؤشر الحالي
+          index: _selectedIndex,
           height: 60.0,
-          // تصميم جذاب: لون داكن للشريط ولون فاتح للخلفية
-          color: Palette.primary, // لون الشريط الأساسي (داكن)
+          color: Palette.primary,
           buttonBackgroundColor: Colors.white,
-          backgroundColor:
-              Colors.white, // يجب أن يكون نفس لون خلفية الـ Scaffold
+          backgroundColor: Colors.white,
           animationCurve: Curves.easeInOut,
           animationDuration: const Duration(milliseconds: 300),
 
-          // العناصر داخل شريط التنقل (الأيقونات)
           items: <Widget>[
             Icon(
               Icons.home,
@@ -112,7 +89,7 @@ class _HomeViewState extends State<HomeView> {
               color: _selectedIndex == 1 ? Palette.primary : Colors.white,
             ),
             Icon(
-              Icons.person,
+              Icons.notifications,
               size: 30,
               color: _selectedIndex == 2 ? Palette.primary : Colors.white,
             ),
@@ -123,19 +100,15 @@ class _HomeViewState extends State<HomeView> {
             ),
           ],
 
-          // دالة الاستدعاء عند النقر على أيقونة
           onTap: (index) {
             setState(() {
               _selectedIndex = index;
             });
           },
 
-          // لجعل الشريط يظهر فوق الـ body بشكل منحنٍ
           letIndexChange: (index) => true,
         ),
       ),
     );
   }
 }
-
-// نموذج بسيط لـ ProfileDrawer (للحفاظ على الكود الأصلي)

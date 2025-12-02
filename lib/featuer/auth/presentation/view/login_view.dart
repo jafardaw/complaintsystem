@@ -154,12 +154,12 @@ class LoginViewBody extends StatelessWidget {
                     },
 
                     child: Padding(
-                      padding: EdgeInsets.only(
-                        left: MediaQuery.of(context).size.width * 0.59,
-                      ),
+                      padding: EdgeInsets.only(left: 100),
                       child: Text(
                         'نسيت كلمة المرور؟',
-                        style: Styles.textStyle16,
+                        style: Styles.textStyle16.copyWith(
+                          color: Palette.backgroundColor,
+                        ),
                       ),
                     ),
                   ),

@@ -86,7 +86,7 @@ class CustomButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           splashColor: hasCustomColor
               ? Colors.grey.withValues(alpha: 0.3)
-              : Palette.primary.withValues(alpha: 0.5),
+              : Palette.primary,
           highlightColor: Colors.transparent,
           child: Ink(
             decoration: BoxDecoration(

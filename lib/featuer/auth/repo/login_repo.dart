@@ -56,17 +56,17 @@ class LoginRepo {
       final data = response.data;
 
       // **التعديل هنا:** التأكد من وجود user_id وكونه من نوع int
-      if (data != null && data.containsKey('id') && data['data']['id'] is int) {
-        // يمكنك طباعة رسالة النجاح في وضع التطوير للمراجعة
-        if (kDebugMode) {
-          print('Registration successful. Message: ${data['message']}');
-        }
-        // إرجاع user_id بدلاً من الرسالة
-        return data['user_id'];
-      }
+      // if (data != null && data.containsKey('id') && data['user_id'] is int) {
+      //   // يمكنك طباعة رسالة النجاح في وضع التطوير للمراجعة
+      //   if (kDebugMode) {
+      //     print('Registration successful. Message: ${data['message']}');
+      //   }
+      //   // إرجاع user_id بدلاً من الرسالة
+      return data['user_id'];
+      // }
 
       // في حال كانت الاستجابة 200 لكن بدون user_id
-      throw Exception('فشل في العثور على User ID في استجابة التسجيل.');
+      // throw Exception('فشل في العثور على User ID في استجابة التسجيل.');
     } on DioException catch (e) {
       if (kDebugMode) {
         print('DioException caught in RegisterRepo: ${e.message}');
