@@ -5,7 +5,7 @@ abstract class Styles {
   static const textStyle18 = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.bold,
-    color: Palette.primary,
+    color: Palette.backgroundColor,
   );
   static const textStyle18Bold = TextStyle(
     fontSize: 18,
@@ -16,6 +16,7 @@ abstract class Styles {
   static const textStyle20 = TextStyle(
     fontSize: 20,
     fontWeight: FontWeight.bold,
+    color: Palette.backgroundColor,
     // fontFamily: kGTSectraFineRegular,
   );
   static const textStyle22 = TextStyle(
@@ -38,5 +39,10 @@ abstract class Styles {
     fontSize: 16,
     fontWeight: FontWeight.bold,
     color: Palette.text,
+  );
+  static const textStyle17 = TextStyle(
+    fontSize: 17,
+    color: Colors.black87,
+    fontWeight: FontWeight.w500,
   );
 }

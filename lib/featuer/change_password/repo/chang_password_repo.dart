@@ -31,14 +31,14 @@ class ChangPasswordRepo {
   }
 
   Future<String> resetPassword({
-    required int userId,
+    required String email,
     required String code,
     required String password,
     required String passwordConfirmation,
   }) async {
     try {
-      final response = await _apiService.post('password/reset', {
-        "user_id": userId,
+      final response = await _apiService.post('auth/reset-password', {
+        "contact": email,
         "code": code,
         "password": password,
         "password_confirmation": passwordConfirmation,

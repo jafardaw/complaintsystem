@@ -1,5 +1,6 @@
 import 'package:compaintsystem/core/func/show_snak_bar.dart';
 import 'package:compaintsystem/core/style/color.dart';
+import 'package:compaintsystem/core/style/styles.dart';
 import 'package:compaintsystem/core/utils/api_service.dart';
 import 'package:compaintsystem/core/utils/assetimage.dart';
 import 'package:compaintsystem/core/utils/const.dart';
@@ -94,16 +95,16 @@ class RegisterViewBody extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: Image.asset(
-                      height: 280,
-                      width: 280,
+                      height: 240,
+                      width: 240,
                       Assets.assetsImagesPhoto20250924144805RemovebgPreview,
                       fit: BoxFit.contain,
                     ),
                   ),
 
                   const Text(
-                    'إنشاء حساب جديد', // تعديل رسالة الترحيب
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                    'أدخل المعلومات  التالية لانشاء حسابك', // تعديل رسالة الترحيب
+                    style: Styles.textStyle20,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 40),
@@ -161,13 +162,13 @@ class RegisterViewBody extends StatelessWidget {
                   BlocConsumer<RegisterCubit, RegisterState>(
                     listener: (context, state) {
                       if (state is RegisterSuccess) {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) =>
-                        //         VerifyEmailView(userID: state.userId),
-                        //   ),
-                        // );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                VerifyEmailView(email: _emailController.text),
+                          ),
+                        );
                         showCustomSnackBar(
                           context,
                           state.message, // "تم إرسال كود التحقق بنجاح."

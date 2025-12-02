@@ -8,7 +8,7 @@ class ResetPasswordCubit extends Cubit<ResetPasswordState> {
   ResetPasswordCubit(this._changPasswordRepo) : super(ResetPasswordInitial());
 
   Future<void> resetPassword({
-    required int userId,
+    required String email,
     required String code,
     required String password,
     required String passwordConfirmation,
@@ -16,7 +16,7 @@ class ResetPasswordCubit extends Cubit<ResetPasswordState> {
     emit(ResetPasswordLoading());
     try {
       final message = await _changPasswordRepo.resetPassword(
-        userId: userId,
+        email: email,
         code: code,
         password: password,
         passwordConfirmation: passwordConfirmation,

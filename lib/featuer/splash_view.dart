@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:compaintsystem/core/utils/assetimage.dart';
+import 'package:compaintsystem/featuer/auth/presentation/view/login_view.dart';
 import 'package:compaintsystem/featuer/auth/presentation/view/register_view.dart';
 import 'package:flutter/material.dart';
 
@@ -37,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen>
     // 💡 قم باستبدال هذا الجزء بمنطق التحقق من حالة المستخدم والانتقال الصحيح
     // (مثلاً: التحقق من تسجيل الدخول والانتقال إما للصفحة الرئيسية أو شاشة الدخول)
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const RegisterView()),
+      MaterialPageRoute(builder: (context) => const LoginView()),
     );
   }
 
