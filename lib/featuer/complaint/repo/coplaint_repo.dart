@@ -10,11 +10,14 @@ class ComplaintsRepo {
   ComplaintsRepo(this._apiService);
 
   // 💡 جلب قائمة الشكاوى مع دعم الترقيم
-  Future<ComplaintsResponse> fetchComplaints({int page = 1}) async {
+  Future<ComplaintsResponse> fetchComplaints({
+    int page = 1,
+    required int agencyid,
+  }) async {
     try {
       // ⚠️ استخدام endpoint 'complaints' وإرسال رقم الصفحة كـ query parameter
       final response = await _apiService.get(
-        'complaints',
+        'admin/agencies/$agencyid/complaints',
         queryParameters: {'page': page},
       );
 

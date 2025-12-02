@@ -10,13 +10,16 @@ class ComplaintsCubit extends Cubit<ComplaintsState> {
   ComplaintsCubit(this._repo) : super(ComplaintsInitial());
 
   // دالة جلب الشكاوى
-  Future<void> fetchComplaints({int page = 1}) async {
+  Future<void> fetchComplaints({int page = 1, required int agencyid}) async {
     if (page == 1) {
       emit(ComplaintsLoading());
     }
 
     try {
-      final response = await _repo.fetchComplaints(page: page);
+      final response = await _repo.fetchComplaints(
+        page: page,
+        agencyid: agencyid,
+      );
 
       _currentPage = response.currentPage;
       _lastPage = response.lastPage;
@@ -35,16 +38,16 @@ class ComplaintsCubit extends Cubit<ComplaintsState> {
   }
 
   // التنقل للصفحة التالية
-  void nextPage() {
+  nextPage(int agencyid) {
     if (_currentPage < _lastPage) {
-      fetchComplaints(page: _currentPage + 1);
+      fetchComplaints(page: _currentPage + 1, agencyid: agencyid);
     }
   }
 
   // التنقل للصفحة السابقة
-  void previousPage() {
+  previousPage(int agencyid) {
     if (_currentPage > 1) {
-      fetchComplaints(page: _currentPage - 1);
+      fetchComplaints(page: _currentPage - 1, agencyid: agencyid);
     }
   }
 }

@@ -10,6 +10,7 @@ Widget buildPaginationControls(
   BuildContext context,
   ComplaintsSuccess state,
   ComplaintsCubit cubit,
+  int agencyid,
 ) {
   return Container(
     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
@@ -34,7 +35,7 @@ Widget buildPaginationControls(
           label: 'السابق',
           icon: Icons.arrow_back_ios_new,
           isEnabled: state.currentPage > 1,
-          onPressed: cubit.previousPage,
+          onPressed: cubit.previousPage(agencyid),
           isNext: false,
         ),
 
@@ -54,7 +55,7 @@ Widget buildPaginationControls(
           label: 'التالي',
           icon: Icons.arrow_forward_ios,
           isEnabled: state.currentPage < state.lastPage,
-          onPressed: cubit.nextPage,
+          onPressed: cubit.nextPage(agencyid),
           isNext: true,
         ),
       ],
