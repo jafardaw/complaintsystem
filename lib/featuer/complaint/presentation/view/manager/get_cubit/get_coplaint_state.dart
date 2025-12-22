@@ -1,4 +1,4 @@
-import 'package:compaintsystem/featuer/complaint/data/complaint_model';
+import 'package:compaintsystem/featuer/complaint/data/complaint_model.dart';
 
 abstract class ComplaintsState {}
 

@@ -10,21 +10,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ComplaintsView extends StatelessWidget {
-  const ComplaintsView({super.key});
+  const ComplaintsView({super.key, required this.agencyid});
+  final int agencyid;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          ComplaintsCubit(ComplaintsRepo(ApiService()))
-            ..fetchComplaints(), // جلب البيانات عند بدء تشغيل الشاشة
-      child: const ComplaintsViewBody(),
+      create: (context) => ComplaintsCubit(ComplaintsRepo(ApiService()))
+        ..fetchComplaints(
+          agencyid: agencyid,
+        ), // جلب البيانات عند بدء تشغيل الشاشة
+      child: ComplaintsViewBody(agencyid: agencyid),
     );
   }
 }
 
 class ComplaintsViewBody extends StatelessWidget {
-  const ComplaintsViewBody({super.key});
+  const ComplaintsViewBody({super.key, required this.agencyid});
+  final int agencyid;
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +77,7 @@ class ComplaintsViewBody extends StatelessWidget {
                   ),
                 ),
 
-                buildPaginationControls(context, state, cubit),
+                buildPaginationControls(context, state, cubit, agencyid),
               ],
             );
           }

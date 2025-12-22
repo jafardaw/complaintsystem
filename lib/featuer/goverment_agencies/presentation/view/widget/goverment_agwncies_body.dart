@@ -2,6 +2,7 @@ import 'package:compaintsystem/core/func/calculat_cross_axis_count.dart';
 import 'package:compaintsystem/core/func/float_action_button.dart';
 import 'package:compaintsystem/core/utils/api_service.dart';
 import 'package:compaintsystem/core/widget/app_bar_widget.dart';
+import 'package:compaintsystem/featuer/complaint/presentation/view/complaint_view.dart';
 import 'package:compaintsystem/featuer/goverment_agencies/presentation/view/add_new_goverment_agencies_view.dart';
 import 'package:compaintsystem/featuer/goverment_agencies/presentation/view/manager/get_cubit/get_governmentagency_cubit.dart';
 import 'package:compaintsystem/featuer/goverment_agencies/presentation/view/manager/get_cubit/get_governmentagency_state.dart';
@@ -91,6 +92,13 @@ class _GovermentAgenciesViewBodyState extends State<GovermentAgenciesViewBody> {
                 return AgencyGridCardM3(
                   onComplaint: () {
                     print('mmmmmmmmmmmm');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ComplaintsView(agencyid: agency.id),
+                      ),
+                    );
                   },
                   agency: agency,
                   onDelete: () {},

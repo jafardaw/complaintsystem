@@ -1,7 +1,6 @@
-import 'package:compaintsystem/core/style/color.dart'; // افترض وجود Palette هنا
-import 'package:compaintsystem/featuer/complaint/data/complaint_model';
+import 'package:compaintsystem/core/style/color.dart';
+import 'package:compaintsystem/featuer/complaint/data/complaint_model.dart';
 import 'package:compaintsystem/featuer/complaint/presentation/view/widget/build_status_complaint.dart';
-import 'package:compaintsystem/featuer/complaint/presentation/view/widget/pdf_complaint.dart';
 import 'package:flutter/material.dart';
 
 class ComplaintCard extends StatelessWidget {
@@ -140,32 +139,32 @@ class ComplaintCard extends StatelessWidget {
                   ),
 
                   // عدد المرفقات
-                  if (complaint.attachments.isNotEmpty)
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    PdfComplaint(complaint: complaint),
-                              ),
-                            );
-                          },
-                          icon: Icon(
-                            Icons.attachment,
-                            size: 16,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${complaint.attachments.length}',
-                          style: TextStyle(color: Colors.grey.shade600),
-                        ),
-                      ],
-                    ),
+                  // if (complaint.attachments.isNotEmpty)
+                  // Row(
+                  //   children: [
+                  //     IconButton(
+                  //       onPressed: () {
+                  //         Navigator.push(
+                  //           context,
+                  //           MaterialPageRoute(
+                  //             builder: (context) =>
+                  //                 PdfComplaint(complaint: complaint),
+                  //           ),
+                  //         );
+                  //       },
+                  //       icon: Icon(
+                  //         Icons.attachment,
+                  //         size: 16,
+                  //         color: Colors.grey.shade600,
+                  //       ),
+                  //     ),
+                  //     const SizedBox(width: 4),
+                  //     Text(
+                  //       '${complaint.attachments.length}',
+                  //       style: TextStyle(color: Colors.grey.shade600),
+                  //     ),
+                  //   ],
+                  // ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -175,7 +174,7 @@ class ComplaintCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    'تاريخ الإنشاء: ${complaint.createdAt.substring(0, 10)}', // عرض التاريخ فقط
+                    'تاريخ الإنشاء: ${complaint.createdAt}', // عرض التاريخ فقط
                     style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                   ),
                 ],
