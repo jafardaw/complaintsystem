@@ -1,19 +1,30 @@
-// lib/features/notifications/logic/notification_state.dart
+// lib/features/notifications/logic/notification_cubit.dart
 
-abstract class NotificationState {}
+import 'package:compaintsystem/featuer/notification/presentation/manger/cubit/stor_fcm_state.dart';
+import 'package:compaintsystem/featuer/notification/repo/notifacation_repo.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class NotificationInitial extends NotificationState {}
+class NotificationCubit extends Cubit<NotificationState> {
+  final NotificationRepo _notificationRepo;
 
-class RegisterTokenLoading extends NotificationState {}
+  NotificationCubit(this._notificationRepo) : super(NotificationInitial());
 
-class RegisterTokenSuccess extends NotificationState {
-  final String message; // رسالة النجاح من الخادم
+  Future<void> registerToken({
+    required String fcmToken,
+    required String deviceId,
+  }) async {
+    emit(RegisterTokenLoading());
+    try {
+      final message = await _notificationRepo.registerFcmToken(
+        fcmToken: fcmToken,
+        deviceId: deviceId,
+      );
 
-  RegisterTokenSuccess(this.message);
-}
-
-class RegisterTokenFailure extends NotificationState {
-  final String error;
-
-  RegisterTokenFailure(this.error);
+      // تمرير رسالة النجاح
+      emit(RegisterTokenSuccess(message));
+    } catch (e) {
+      // تمرير رسالة الخطأ
+      emit(RegisterTokenFailure(e.toString()));
+    }
+  }
 }

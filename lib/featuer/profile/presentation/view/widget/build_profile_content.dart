@@ -1,5 +1,11 @@
+import 'package:compaintsystem/core/func/show_snak_bar.dart';
+import 'package:compaintsystem/core/style/color.dart';
+import 'package:compaintsystem/core/theme/manger/theme_cubit.dart';
 import 'package:compaintsystem/core/utils/api_service.dart';
 import 'package:compaintsystem/featuer/auth/data/model/login_model.dart';
+import 'package:compaintsystem/featuer/auth/presentation/manger/logout_cubit.dart';
+import 'package:compaintsystem/featuer/auth/presentation/manger/logout_state.dart';
+import 'package:compaintsystem/featuer/auth/presentation/view/login_view.dart';
 import 'package:compaintsystem/featuer/profile/presentation/manger/cubit/edit_profile_state.dart';
 import 'package:compaintsystem/featuer/profile/presentation/view/edit_profile_view.dart';
 import 'package:compaintsystem/featuer/profile/presentation/view/widget/build_action.dart';
@@ -105,15 +111,147 @@ class ProfileContentWidget extends StatelessWidget {
           },
           color: Theme.of(context).primaryColor,
         ),
+        IconButton(
+          icon: Icon(
+            context.watch<ThemeCubit>().state == ThemeMode.dark
+                ? Icons.dark_mode
+                : Icons.light_mode,
+          ),
+          onPressed: () {
+            context.read<ThemeCubit>().toggleTheme();
+          },
+        ),
 
-        buildActionTile(
-          context,
-          title: 'تسجيل الخروج',
-          icon: Icons.exit_to_app,
-          onTap: () {},
-          color: Colors.red.shade700,
+        BlocConsumer<LogoutCubit, LogoutState>(
+          listener: (context, state) {
+            if (state is LogoutSuccess) {
+              // إظهار رسالة نجاح وتوجيه المستخدم لشاشة تسجيل الدخول
+              showCustomSnackBar(
+                context,
+                "تم تسجيل الخروج بنجاح",
+                color: Palette.success,
+              );
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginView()),
+              );
+            } else if (state is LogoutFailure) {
+              // إظهار خطأ في حال فشل العملية
+              showCustomSnackBar(context, state.error, color: Palette.error);
+            }
+          },
+          builder: (context, state) {
+            return buildActionTile(
+              context,
+              title: 'تسجيل الخروج',
+              icon: Icons.exit_to_app,
+              color: Colors.red.shade700,
+              // استدعاء نافذة التحذير عند الضغط
+              onTap: () => _showLogoutConfirmationDialog(context),
+            );
+          },
         ),
       ],
+    );
+  }
+
+  void _showLogoutConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 16,
+          child: Container(
+            padding: const EdgeInsets.all(30),
+            width: 450, // عرض مناسب جداً للويب
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // أيقونة تحذيرية بتصميم عصري
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.warning_amber_rounded,
+                    size: 50,
+                    color: Colors.red,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  "تأكيد تسجيل الخروج",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  "هل أنت متأكد أنك تريد مغادرة النظام؟ ستحتاج إلى إدخال بياناتك مرة أخرى للوصول إلى حسابك.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                Row(
+                  children: [
+                    // زر الإلغاء
+                    Expanded(
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          side: BorderSide(color: Colors.grey.shade300),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text(
+                          "إلغاء",
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    // زر التأكيد
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.shade700,
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context); // إغلاق الحوار
+                          context
+                              .read<LogoutCubit>()
+                              .performLogout(); // تنفيذ الخروج
+                        },
+                        child: const Text(
+                          "خروج",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

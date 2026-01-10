@@ -5,6 +5,7 @@ class GovernmentAgency {
   final String city;
   final String address;
   final String phone;
+  final int complaintscount;
 
   GovernmentAgency({
     required this.id,
@@ -13,16 +14,19 @@ class GovernmentAgency {
     required this.city,
     required this.address,
     required this.phone,
+    required this.complaintscount,
   });
 
   factory GovernmentAgency.fromJson(Map<String, dynamic> json) {
     return GovernmentAgency(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      category: json['category'] as String,
-      city: json['city'] as String,
-      address: json['address'] as String,
-      phone: json['phone'] as String,
+      // استخدام ?? يمنع خطأ الـ Null تماماً
+      id: json['id'] as int? ?? 0,
+      name: json['name'] as String? ?? 'غير معروف',
+      category: json['category'] as String? ?? 'عام',
+      city: json['city'] as String? ?? 'غير محدد',
+      address: json['address'] as String? ?? '',
+      phone: json['phone'] as String? ?? '',
+      complaintscount: json['complaints_count'] as int? ?? 0,
     );
   }
 }
@@ -39,14 +43,13 @@ class AgenciesPaginationModel {
   });
 
   factory AgenciesPaginationModel.fromJson(Map<String, dynamic> json) {
-    // معالجة قائمة البيانات (data list)
-    final List<dynamic> dataList = json['data'] ?? [];
-    final List<GovernmentAgency> agenciesList = dataList
-        .map((agencyJson) => GovernmentAgency.fromJson(agencyJson))
-        .toList();
+    // معالجة القائمة بشكل آمن
+    var dataList = json['data'] as List? ?? [];
 
     return AgenciesPaginationModel(
-      agencies: agenciesList,
+      agencies: dataList
+          .map((agencyJson) => GovernmentAgency.fromJson(agencyJson))
+          .toList(),
       currentPage: json['current_page'] as int? ?? 1,
       lastPage: json['last_page'] as int? ?? 1,
     );

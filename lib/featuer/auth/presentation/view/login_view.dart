@@ -27,8 +27,10 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _emailController = TextEditingController(
+    text: 'michaelghossen@gmail.com',
+  );
+  final _passwordController = TextEditingController(text: 'password123');
 
   @override
   void dispose() {
@@ -154,12 +156,12 @@ class LoginViewBody extends StatelessWidget {
                     },
 
                     child: Padding(
-                      padding: EdgeInsets.only(
-                        left: MediaQuery.of(context).size.width * 0.59,
-                      ),
+                      padding: EdgeInsets.only(left: 100),
                       child: Text(
                         'نسيت كلمة المرور؟',
-                        style: Styles.textStyle16,
+                        style: Styles.textStyle16.copyWith(
+                          color: Palette.backgroundColor,
+                        ),
                       ),
                     ),
                   ),

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:compaintsystem/core/style/color.dart';
 import 'package:compaintsystem/featuer/complaint/presentation/view/manager/get_cubit/get_coplaint_cubit.dart';
 import 'package:compaintsystem/featuer/complaint/presentation/view/manager/get_cubit/get_coplaint_state.dart';
@@ -35,7 +33,8 @@ Widget buildPaginationControls(
           label: 'السابق',
           icon: Icons.arrow_back_ios_new,
           isEnabled: state.currentPage > 1,
-          onPressed: cubit.previousPage(agencyid),
+          onPressed: () => cubit.previousPage(agencyid),
+
           isNext: false,
         ),
 
@@ -55,7 +54,7 @@ Widget buildPaginationControls(
           label: 'التالي',
           icon: Icons.arrow_forward_ios,
           isEnabled: state.currentPage < state.lastPage,
-          onPressed: cubit.nextPage(agencyid),
+          onPressed: () => cubit.nextPage(agencyid), // ✅ تمرير كـ Callback
           isNext: true,
         ),
       ],

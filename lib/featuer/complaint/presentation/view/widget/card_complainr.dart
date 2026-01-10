@@ -1,188 +1,397 @@
-import 'package:compaintsystem/core/style/color.dart'; // افترض وجود Palette هنا
-import 'package:compaintsystem/featuer/complaint/data/complaint_model';
-import 'package:compaintsystem/featuer/complaint/presentation/view/widget/build_status_complaint.dart';
-import 'package:compaintsystem/featuer/complaint/presentation/view/widget/pdf_complaint.dart';
+import 'package:compaintsystem/core/style/color.dart';
+import 'package:compaintsystem/featuer/complaint/data/complaint_model.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class ComplaintCard extends StatelessWidget {
+class ModernComplaintCard extends StatelessWidget {
   final Complaint complaint;
-  const ComplaintCard({super.key, required this.complaint});
+  final VoidCallback? onTap;
 
-  // تحديد اللون بناءً على حالة الشكوى (Status)
+  const ModernComplaintCard({super.key, required this.complaint, this.onTap});
+
+  // --- الدوال المساعدة للألوان والأيقونات ---
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'new':
-        return Colors.green.shade600;
-      case 'in_progress':
         return Colors.blue.shade600;
+      case 'in_progress':
+        return Colors.orange.shade600;
       case 'closed':
-        return Colors.grey.shade600;
-      case 'high':
-        return Palette.error; // لون الخطأ (أحمر)
+        return Colors.green.shade600;
       default:
-        return Colors.amber.shade700;
+        return Colors.grey.shade600;
     }
   }
 
-  // تحديد أيقونة بناءً على الأولوية (Priority)
-  IconData _getPriorityIcon(String priority) {
+  Color _getPriorityColor(String priority) {
     switch (priority.toLowerCase()) {
       case 'high':
-        return Icons.keyboard_double_arrow_up_rounded;
+        return Colors.red.shade600;
       case 'medium':
-        return Icons.arrow_upward_rounded;
+        return Colors.orange.shade700;
       case 'low':
-        return Icons.arrow_downward_rounded;
+        return Colors.green.shade600;
       default:
-        return Icons.list_alt_rounded;
+        return Colors.blue.shade600;
+    }
+  }
+
+  IconData _getStatusIcon(String status) {
+    switch (status.toLowerCase()) {
+      case 'new':
+        return Icons.fiber_new_rounded;
+      case 'in_progress':
+        return Icons.pending_actions_rounded;
+      case 'closed':
+        return Icons.task_alt_rounded;
+      default:
+        return Icons.info_outline_rounded;
+    }
+  }
+
+  String _formatDate(String dateString) {
+    try {
+      final date = DateTime.parse(dateString);
+      return DateFormat('yyyy/MM/dd • hh:mm a').format(date);
+    } catch (e) {
+      return dateString;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final statusColor = _getStatusColor(complaint.status);
-    final priorityColor = _getStatusColor(
-      complaint.priority,
-    ); // نستخدم نفس دالة اللون للأولوية لتبسيط
+    final priorityColor = _getPriorityColor(complaint.priority);
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      elevation: 8, // ظل واضح
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: InkWell(
-        onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('تم عرض تفاصيل الشكوى: ${complaint.referenceCode}'),
-            ),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 1. العنوان والرمز المرجعي (Reference Code)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      complaint.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Palette.primary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Text(
-                    complaint.referenceCode,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
-              ),
-              const Divider(height: 16, thickness: 0.5),
-
-              // 2. الهيئة المدينة
-              Row(
-                children: [
-                  const Icon(Icons.business, size: 16, color: Colors.black54),
-                  const SizedBox(width: 5),
-                  Expanded(
-                    child: Text(
-                      complaint.agency.name,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-                  const Icon(
-                    Icons.location_on,
-                    size: 16,
-                    color: Colors.black54,
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    complaint.locationText,
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-
-              // 3. الحالة والأولوية والمرفقات (Chips & Icons)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // حالة الشكوى (Chip)
-                  buildStatusChip(
-                    label: complaint.status,
-                    color: statusColor,
-                    icon: Icons.info_outline,
-                  ),
-
-                  // الأولوية (Chip)
-                  buildStatusChip(
-                    label: complaint.priority,
-                    color: priorityColor,
-                    icon: _getPriorityIcon(complaint.priority),
-                  ),
-
-                  // عدد المرفقات
-                  if (complaint.attachments.isNotEmpty)
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    PdfComplaint(complaint: complaint),
-                              ),
-                            );
-                          },
-                          icon: Icon(
-                            Icons.attachment,
-                            size: 16,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${complaint.attachments.length}',
-                          style: TextStyle(color: Colors.grey.shade600),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
-              const SizedBox(height: 10),
-
-              // 4. تاريخ الإنشاء
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    'تاريخ الإنشاء: ${complaint.createdAt.substring(0, 10)}', // عرض التاريخ فقط
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                  ),
-                ],
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(24),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.06),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Stack(
+              children: [
+                // زينة خلفية (Background Decoration)
+                Positioned(
+                  left: -20,
+                  top: -20,
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundColor: statusColor.withOpacity(0.05),
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 1. الرأس (الحالة والأولوية والكود)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              _buildBadge(
+                                label: complaint.status.toUpperCase(),
+                                color: statusColor,
+                                icon: _getStatusIcon(complaint.status),
+                              ),
+                              const SizedBox(width: 8),
+                              _buildBadge(
+                                label: complaint.priority.toUpperCase(),
+                                color: priorityColor,
+                                icon: Icons.priority_high_rounded,
+                              ),
+                            ],
+                          ),
+                          Text(
+                            complaint.referenceCode,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey.shade400,
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // 2. العنوان
+                      Text(
+                        complaint.title,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A1A1A),
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // 3. الجهة المسؤولة والموقع
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.account_balance_rounded,
+                            size: 16,
+                            color: Colors.blueGrey.shade300,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            complaint.agency.name,
+                            style: TextStyle(
+                              color: Colors.blueGrey.shade700,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                          const Spacer(),
+                          Icon(
+                            Icons.location_on_rounded,
+                            size: 16,
+                            color: Colors.red.shade300,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            complaint.locationText
+                                .split(',')
+                                .last
+                                .trim(), // عرض المدينة فقط للاختصار
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.description,
+                            size: 16,
+                            color: Colors.blueGrey.shade300,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            complaint.description,
+                            style: TextStyle(
+                              color: Colors.blueGrey.shade700,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                          const Spacer(),
+
+                          const SizedBox(width: 4),
+                        ],
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Divider(height: 1, thickness: 0.5),
+                      ),
+
+                      // 4. قسم المستخدم (User Info Section) - التعديل الجديد
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 18,
+                            backgroundColor: Colors.blue.shade50,
+                            child: Text(
+                              complaint.user.name[0].toUpperCase(),
+                              style: TextStyle(
+                                color: Colors.blue.shade700,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  complaint.user.name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.phone_iphone_rounded,
+                                      size: 12,
+                                      color: Colors.grey.shade500,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      complaint.user.phone,
+                                      style: TextStyle(
+                                        color: Colors.grey.shade600,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.email,
+                                      size: 12,
+                                      color: Colors.grey.shade500,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      complaint.user.email,
+                                      style: TextStyle(
+                                        color: Colors.grey.shade600,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          // أيقونة المرفقات إن وجدت
+                          if (complaint.attachments.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.attach_file_rounded,
+                                    size: 14,
+                                    color: Colors.grey,
+                                  ),
+                                  Text(
+                                    "${complaint.attachments.length}",
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // 5. التوقيت (Footer)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_today_rounded,
+                                size: 14,
+                                color: Colors.grey.shade400,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                _formatDate(complaint.createdAt),
+                                style: TextStyle(
+                                  color: Colors.grey.shade500,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 14,
+                            color: Colors.grey.shade300,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // شريط ملون جانبي يعبر عن الحالة
+                Positioned(
+                  right: 0,
+                  top: 40,
+                  bottom: 40,
+                  child: Container(
+                    width: 4,
+                    decoration: BoxDecoration(
+                      color: statusColor,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(4),
+                        bottomLeft: Radius.circular(4),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
+      ),
+    );
+  }
+
+  // ويدجت مساعدة لبناء الـ Badges
+  Widget _buildBadge({
+    required String label,
+    required Color color,
+    required IconData icon,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.2), width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ],
       ),
     );
   }

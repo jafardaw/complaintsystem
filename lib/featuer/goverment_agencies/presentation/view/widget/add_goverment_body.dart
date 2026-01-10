@@ -1,5 +1,3 @@
-// 💡 الودجت الذي يحتوي على النموذج
-
 import 'package:compaintsystem/core/func/show_snak_bar.dart';
 import 'package:compaintsystem/core/style/color.dart';
 import 'package:compaintsystem/core/widget/app_bar_widget.dart';
@@ -22,7 +20,6 @@ class _CreateGovernmentAgencyViewBodyState
     extends State<CreateGovernmentAgencyViewBody> {
   final _formKey = GlobalKey<FormState>();
 
-  // متحكمات الحقول
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
@@ -39,7 +36,6 @@ class _CreateGovernmentAgencyViewBodyState
     super.dispose();
   }
 
-  // دالة إرسال النموذج
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       context.read<CreateGovernmentAgencyCubit>().createAgency(
@@ -55,8 +51,9 @@ class _CreateGovernmentAgencyViewBodyState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppareWidget(
-        title: 'إنشاء هيئة حكومية جديدة',
+        title: 'بوابة إضافة الهيئات الحكومية',
         automaticallyImplyLeading: true,
       ),
       body:
@@ -71,81 +68,39 @@ class _CreateGovernmentAgencyViewBodyState
                   state.message,
                   color: Palette.success,
                 );
-                _nameController.clear();
-                _categoryController.clear();
-                _cityController.clear();
-                _addressController.clear();
-                _phoneController.clear();
+                _clearControllers();
                 Navigator.pop(context, true);
               } else if (state is CreateGovernmentAgencyError) {
                 showCustomSnackBar(context, state.error, color: Palette.error);
               }
             },
             child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // حقل اسم الهيئة
-                      _buildTextField(
-                        controller: _nameController,
-                        labelText: 'اسم الهيئة (مثال: وزارة الصحة)',
-                        icon: Icons.apartment_outlined,
-                        validator: (value) =>
-                            value!.isEmpty ? 'الرجاء إدخال اسم الهيئة' : null,
-                      ),
-                      const SizedBox(height: 15),
+              // التأكد من وجود مساحة كافية في الأسفل ليظهر الزر عند التمرير
+              padding: const EdgeInsets.symmetric(vertical: 60),
+              child: Center(
+                child: SizedBox(
+                  width: 1100, // العرض الثابت للويب
+                  child: Card(
+                    elevation: 10,
+                    shadowColor: Colors.black.withOpacity(0.05),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(60),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisSize:
+                              MainAxisSize.min, // ليأخذ العمود مساحة محتواه فقط
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildHeader(),
+                            const SizedBox(height: 48),
+                            _buildFieldsGrid(),
+                            const SizedBox(height: 48),
 
-                      // حقل الفئة
-                      _buildTextField(
-                        controller: _categoryController,
-                        labelText: 'الفئة (مثال: وزارة، هيئة، مديرية)',
-                        icon: Icons.category_outlined,
-                        validator: (value) =>
-                            value!.isEmpty ? 'الرجاء إدخال الفئة' : null,
-                      ),
-                      const SizedBox(height: 15),
-
-                      // حقل المدينة
-                      _buildTextField(
-                        controller: _cityController,
-                        labelText: 'المدينة (مثال: دمشق)',
-                        icon: Icons.location_city_outlined,
-                        validator: (value) =>
-                            value!.isEmpty ? 'الرجاء إدخال المدينة' : null,
-                      ),
-                      const SizedBox(height: 15),
-
-                      // حقل العنوان
-                      _buildTextField(
-                        controller: _addressController,
-                        labelText: 'العنوان التفصيلي (مثال: شارع أبو رمانة)',
-                        icon: Icons.place_outlined,
-                        validator: (value) =>
-                            value!.isEmpty ? 'الرجاء إدخال العنوان' : null,
-                      ),
-                      const SizedBox(height: 15),
-
-                      // حقل الهاتف
-                      _buildTextField(
-                        controller: _phoneController,
-                        labelText: 'رقم الهاتف (مثال: +963112345678)',
-                        icon: Icons.phone_outlined,
-                        keyboardType: TextInputType.phone,
-                        validator: (value) =>
-                            value!.isEmpty ? 'الرجاء إدخال رقم الهاتف' : null,
-                      ),
-                      const SizedBox(height: 40),
-
-                      // زر الإرسال الجميل والمتحرك
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.of(context).size.width * 0.12,
-                        ),
-                        child:
+                            // زر الإرسال
                             BlocBuilder<
                               CreateGovernmentAgencyCubit,
                               CreateGovernmentAgencyState
@@ -155,15 +110,16 @@ class _CreateGovernmentAgencyViewBodyState
                                   onTap: state is CreateGovernmentAgencyLoading
                                       ? null
                                       : _submitForm,
-
                                   text: state is CreateGovernmentAgencyLoading
-                                      ? "جار الأضافة"
-                                      : 'إنشاء هيئة جديدة',
+                                      ? "جارٍ الحفظ..."
+                                      : 'إنشاء الهيئة الجديدة',
                                 );
                               },
                             ),
+                          ],
+                        ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -172,7 +128,93 @@ class _CreateGovernmentAgencyViewBodyState
     );
   }
 
-  // دالة مساعدة لبناء CustomTextField
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.add_business_rounded, size: 40, color: Palette.primary),
+            const SizedBox(width: 20),
+            const Text(
+              "إضافة هيئة حكومية جديدة",
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Text(
+          "يرجى تعبئة كافة الحقول بدقة. هذه البيانات ستظهر للمواطنين في واجهة الشكاوى.",
+          style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+        ),
+        const SizedBox(height: 24),
+        const Divider(thickness: 1.5),
+      ],
+    );
+  }
+
+  Widget _buildFieldsGrid() {
+    return Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start, // لضمان توازن الحقول
+          children: [
+            Expanded(child: _buildNameField()),
+            const SizedBox(width: 40),
+            Expanded(child: _buildCategoryField()),
+          ],
+        ),
+        const SizedBox(height: 32),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: _buildCityField()),
+            const SizedBox(width: 40),
+            Expanded(child: _buildPhoneField()),
+          ],
+        ),
+        const SizedBox(height: 32),
+        _buildAddressField(),
+      ],
+    );
+  }
+
+  Widget _buildNameField() => _buildTextField(
+    controller: _nameController,
+    labelText: 'اسم الهيئة الحكومية',
+    icon: Icons.apartment_rounded,
+    validator: (v) => v!.isEmpty ? 'يرجى إدخال اسم الهيئة' : null,
+  );
+
+  Widget _buildCategoryField() => _buildTextField(
+    controller: _categoryController,
+    labelText: 'التصنيف (وزارة، هيئة، مديرية...)',
+    icon: Icons.category_rounded,
+    validator: (v) => v!.isEmpty ? 'يرجى تحديد الفئة' : null,
+  );
+
+  Widget _buildCityField() => _buildTextField(
+    controller: _cityController,
+    labelText: 'المدينة / المحافظة',
+    icon: Icons.location_city_rounded,
+    validator: (v) => v!.isEmpty ? 'يرجى إدخال المدينة' : null,
+  );
+
+  Widget _buildAddressField() => _buildTextField(
+    controller: _addressController,
+    labelText: 'العنوان التفصيلي ومكان التواجد',
+    icon: Icons.map_rounded,
+    validator: (v) => v!.isEmpty ? 'يرجى إدخال العنوان' : null,
+  );
+
+  Widget _buildPhoneField() => _buildTextField(
+    controller: _phoneController,
+    labelText: 'رقم هاتف التواصل الرسمي',
+    icon: Icons.phone_android_rounded,
+    keyboardType: TextInputType.phone,
+    validator: (v) => v!.isEmpty ? 'يرجى إدخال رقم الهاتف' : null,
+  );
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String labelText,
@@ -182,11 +224,18 @@ class _CreateGovernmentAgencyViewBodyState
   }) {
     return CustomTextField(
       controller: controller,
-      label: Text(labelText),
-      prefixIcon: Icon(icon, color: Palette.primary),
+      hintText: labelText,
+      prefixIcon: Icon(icon, color: Palette.primary, size: 24),
       keyboardType: keyboardType,
       validator: validator,
-      floatingLabelBehavior: FloatingLabelBehavior.auto,
     );
+  }
+
+  void _clearControllers() {
+    _nameController.clear();
+    _categoryController.clear();
+    _cityController.clear();
+    _addressController.clear();
+    _phoneController.clear();
   }
 }

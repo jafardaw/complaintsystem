@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class Palette {
   Palette._();
-  static const Color primary = Colors.blueGrey;
+  static const Color primary = Color.fromARGB(255, 106, 155, 180);
   static const Color golder = Colors.black;
+  static const Color waring = Colors.orange;
 
   static const Color secandry = Color(0xffE0E0E0);
   static const Color backgroundColor = Color.fromARGB(255, 250, 249, 246);

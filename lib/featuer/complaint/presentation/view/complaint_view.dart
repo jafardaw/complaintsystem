@@ -3,6 +3,8 @@ import 'package:compaintsystem/core/utils/api_service.dart';
 import 'package:compaintsystem/core/widget/app_bar_widget.dart';
 import 'package:compaintsystem/featuer/complaint/presentation/view/manager/get_cubit/get_coplaint_cubit.dart';
 import 'package:compaintsystem/featuer/complaint/presentation/view/manager/get_cubit/get_coplaint_state.dart';
+import 'package:compaintsystem/featuer/complaint/presentation/view/manager/get_cubit/get_reversion_cubit.dart';
+import 'package:compaintsystem/featuer/complaint/presentation/view/reversion_complaint_view.dart';
 import 'package:compaintsystem/featuer/complaint/presentation/view/widget/build_pagenation_controls.dart';
 import 'package:compaintsystem/featuer/complaint/presentation/view/widget/card_complainr.dart';
 import 'package:compaintsystem/featuer/complaint/repo/coplaint_repo.dart';
@@ -72,7 +74,26 @@ class ComplaintsViewBody extends StatelessWidget {
                   child: ListView.builder(
                     itemCount: state.complaints.length,
                     itemBuilder: (context, index) {
-                      return ComplaintCard(complaint: state.complaints[index]);
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BlocProvider(
+                                create: (context) => RevisionsCubit(
+                                  ComplaintsRepo(ApiService()),
+                                )..fetchRevisions(state.complaints[index].id),
+                                child: ComplaintRevisionsScreen(
+                                  complaintId: state.complaints[index].id,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        child: ModernComplaintCard(
+                          complaint: state.complaints[index],
+                        ),
+                      );
                     },
                   ),
                 ),

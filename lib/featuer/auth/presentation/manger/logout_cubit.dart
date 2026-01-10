@@ -1,6 +1,5 @@
 import 'package:compaintsystem/featuer/auth/presentation/manger/logout_state.dart';
 import 'package:compaintsystem/featuer/auth/repo/login_repo.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LogoutCubit extends Cubit<LogoutState> {
@@ -8,7 +7,7 @@ class LogoutCubit extends Cubit<LogoutState> {
 
   LogoutCubit(this._logoutRepo) : super(LogoutInitial());
 
-  Future<void> performLogout(BuildContext context) async {
+  Future<void> performLogout() async {
     emit(LogoutLoading());
     try {
       final message = await _logoutRepo.logout();

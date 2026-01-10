@@ -2,6 +2,7 @@ import 'package:compaintsystem/core/func/calculat_cross_axis_count.dart';
 import 'package:compaintsystem/core/func/float_action_button.dart';
 import 'package:compaintsystem/core/utils/api_service.dart';
 import 'package:compaintsystem/core/widget/app_bar_widget.dart';
+import 'package:compaintsystem/featuer/complaint/presentation/view/complaint_view.dart';
 import 'package:compaintsystem/featuer/goverment_agencies/presentation/view/add_new_goverment_agencies_view.dart';
 import 'package:compaintsystem/featuer/goverment_agencies/presentation/view/manager/get_cubit/get_governmentagency_cubit.dart';
 import 'package:compaintsystem/featuer/goverment_agencies/presentation/view/manager/get_cubit/get_governmentagency_state.dart';
@@ -9,6 +10,10 @@ import 'package:compaintsystem/featuer/goverment_agencies/presentation/view/mana
 import 'package:compaintsystem/featuer/goverment_agencies/presentation/view/update_goverment_agwncires_view.dart';
 import 'package:compaintsystem/featuer/goverment_agencies/presentation/view/widget/agency_card.dart';
 import 'package:compaintsystem/featuer/goverment_agencies/repo/repo_governmentagency.dart';
+import 'package:compaintsystem/featuer/profile/presentation/view/profile_view.dart';
+import 'package:compaintsystem/featuer/users/presentation/view/add_stuff_view.dart';
+import 'package:compaintsystem/featuer/users/presentation/view/manager/post_cubit/add_stauff_cubit.dart';
+import 'package:compaintsystem/featuer/users/repo/user_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -48,6 +53,7 @@ class _GovermentAgenciesViewBodyState extends State<GovermentAgenciesViewBody> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const ProfileDrawer(),
       appBar: AppareWidget(
         title: 'الهيئات الحكومية',
         automaticallyImplyLeading: true,
@@ -89,8 +95,27 @@ class _GovermentAgenciesViewBodyState extends State<GovermentAgenciesViewBody> {
                 return AgencyGridCardM3(
                   onComplaint: () {
                     print('mmmmmmmmmmmm');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ComplaintsView(agencyid: agency.id),
+                      ),
+                    );
                   },
                   agency: agency,
+                  onperson: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BlocProvider(
+                          create: (context) =>
+                              AddUserCubit(UsersRepository(ApiService())),
+                          child: AddUserScreen(agencyId: agency.id),
+                        ),
+                      ),
+                    );
+                  },
                   onDelete: () {},
                   onEdit: () {
                     Navigator.push(

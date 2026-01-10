@@ -27,16 +27,14 @@ class ApiService {
               'GET, POST, PUT, DELETE, OPTIONS';
           options.headers['Access-Control-Allow-Headers'] =
               'Origin, Content-Type, X-Auth-Token, Authorization';
-          options.headers['Authorization'] =
-              'Bearer 3|Mmo2e5GrLdP71CVILWu37v5EGDdiHuIvnYymxKit842b9c0b';
+          // options.headers['Authorization'] =
+          //     'Bearer ';
 
-          // إضافة token إذا موجود
           try {
             final prefs = await SharedPreferences.getInstance();
             final token = prefs.getString('token');
             if (token != null) {
-              options.headers['Authorization'] =
-                  'Bearer 3|Mmo2e5GrLdP71CVILWu37v5EGDdiHuIvnYymxKit842b9c0b';
+              options.headers['Authorization'] = 'Bearer $token';
             }
           } catch (e) {
             if (kDebugMode) {

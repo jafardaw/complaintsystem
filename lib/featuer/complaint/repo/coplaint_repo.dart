@@ -1,6 +1,7 @@
 import 'package:compaintsystem/core/error/eror_handel.dart';
 import 'package:compaintsystem/core/utils/api_service.dart';
-import 'package:compaintsystem/featuer/complaint/data/complaint_model';
+import 'package:compaintsystem/featuer/complaint/data/complaint_model.dart';
+import 'package:compaintsystem/featuer/complaint/data/reversion_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
@@ -8,6 +9,13 @@ class ComplaintsRepo {
   final ApiService _apiService;
 
   ComplaintsRepo(this._apiService);
+
+  Future<ComplaintRevisionsResponse> getRevisions(int complaintId) async {
+    final response = await _apiService.get(
+      'agency/complaints/$complaintId/revisions',
+    );
+    return ComplaintRevisionsResponse.fromJson(response.data);
+  }
 
   // 💡 جلب قائمة الشكاوى مع دعم الترقيم
   Future<ComplaintsResponse> fetchComplaints({

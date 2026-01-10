@@ -7,6 +7,10 @@ class GovernmentAgenciesCubit extends Cubit<GovernmentAgenciesState> {
   final GovernmentAgenciesRepo _repo;
 
   GovernmentAgenciesCubit(this._repo) : super(GovernmentAgenciesInitial());
+  @override
+  void emit(GovernmentAgenciesState state) {
+    if (!isClosed) super.emit(state);
+  }
 
   // تخزين معلومات الترقيم الحالية
   int _currentPage = 1;
